@@ -1,0 +1,8 @@
+/configs/app.yml
+.vscode
+.idea
+__debug_bin
+/../../__pycache__
+__pycache__
+deployment/configs/app.cfg
+deployment/configs/app-prod.cfg
