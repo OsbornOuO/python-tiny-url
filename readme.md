@@ -1,3 +1,11 @@
+# 網址
+1. https://py-shorten.herokuapp.com
+
+## 使用
+1. flask 
+2. heroku
+3. postgres 
+
 # Feature
 1. 短網址按照 db 的自增 id 做產生
 2. preview 短網址資訊
