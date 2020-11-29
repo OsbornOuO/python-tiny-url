@@ -21,5 +21,10 @@ class NoSupportURL(Error):
     pass
 
 
+class SameDomin(Error):
+    """Raised when the input value is too small"""
+    pass
+
+
 class InvalidInput(Error):
     pass

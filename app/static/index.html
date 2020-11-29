@@ -40,7 +40,7 @@
                 <div class="col-8">
                     <div class="card text-center">
                         <div class="card-body">
-                            <p class="card-text">http://https://py-shorten.herokuapp.com:5000/{{ shortURL }}
+                            <p class="card-text">http://0.0.0.0:17995/{{ shortURL }}
                             </p>
                             <button v-on:click="copyButton">COPY</button>
                         </div>
@@ -63,20 +63,31 @@
             methods: {
                 createShortURL: function (event) {
                     axios
-                        .post('http://https://py-shorten.herokuapp.com:5000/api/v1/shorten', {
+                        .post('http://0.0.0.0:17995/api/v1/shorten', {
                             url: this.longURL, // 参数 firstName
                         })
                         .then(response => (
                             this.shortURL = response.data['short']
                         ))
                         .catch(function (error) { // 请求失败处理
-                            this.shortURL = ''
-                            console.log(error);
+                            if (error.response) {
+                                // Request made and server responded
+                                console.log(error.response.data);
+                                console.log(error.response.status);
+                                console.log(error.response.headers);
+                                alert(error.response.data['error']);
+                            } else if (error.request) {
+                                // The request was made but no response was received
+                                console.log(error.request);
+                            } else {
+                                // Something happened in setting up the request that triggered an Error
+                                console.log('Error', error.message);
+                            }
                         });
                 },
                 copyButton: function () {
                     const el = document.createElement('textarea');
-                    el.value = "http://https://py-shorten.herokuapp.com:5000/this.shortURL";
+                    el.value = "http://0.0.0.0:17995/this.shortURL";
                     el.setAttribute('readonly', '');
                     el.style.position = 'absolute';
                     el.style.left = '-9999px';

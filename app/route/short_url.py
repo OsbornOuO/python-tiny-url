@@ -1,11 +1,11 @@
 from http import HTTPStatus
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort
 # from flasgger import swag_from
 from app.models.short_url import ShortURL
 import json
 from app.extensions import db
 
-from app.errors import ToManyShortURL, NoSupportShortURLCharacter, NoSupportURL, InvalidInput
+from app.errors import ToManyShortURL, NoSupportShortURLCharacter, NoSupportURL, InvalidInput, SameDomin
 
 
 short_url_api = Blueprint('short_url_api', __name__)
@@ -31,11 +31,15 @@ def createShortURL():
         return {
             "error": "fail to bind json",
         }, 400
+    except SameDomin:
+        return {
+            "error": "same domain",
+        }, 400
 
     return result.toJSON(), 200
 
 
-@short_url_api.route('/<short_url>', methods=['GET'])
+@short_url_api.route('/<string:short_url>', methods=['GET'])
 def encodeShortURL(short_url: str):
     result = ShortURL()
     result.init_by_decode(short_url)

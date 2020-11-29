@@ -4,7 +4,7 @@ from app.extensions import db
 from sqlalchemy.sql import func
 import json
 import re
-from app.errors import ToManyShortURL, NoSupportShortURLCharacter, NoSupportURL, InvalidInput
+from app.errors import ToManyShortURL, NoSupportShortURLCharacter, NoSupportURL, InvalidInput, SameDomin
 
 alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 length = len(alphabet)
@@ -39,6 +39,9 @@ class ShortURL(db.Model):
     def verify(self):
         if re.match(regex, self.url) is None:
             raise NoSupportURL
+        if "https://py-shorten.herokuapp.com/" in self.url:
+            raise SameDomin
+    
         return None
 
     def init_by_decode(self, s: str):

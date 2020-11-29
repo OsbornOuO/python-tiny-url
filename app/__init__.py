@@ -51,6 +51,11 @@ def register_extensions(app):
 
 
 def register_errorhandlers(app):
+    @app.errorhandler(404)
+    def page_not_found(e):
+        # note that we set the 404 status explicitly
+        return app.send_static_file('404.html')
+
     @app.errorhandler(Exception)
     def errors(e):
         message = getattr(e, 'description', None) or getattr(
