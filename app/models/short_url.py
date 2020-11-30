@@ -20,6 +20,7 @@ regex = re.compile(
 
 class ShortURL(db.Model):
     __tablename__ = 'short_urls'
+    __table_args__ = {"schema": "py-shorten"}
 
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(2048), nullable=False)
@@ -41,7 +42,7 @@ class ShortURL(db.Model):
             raise NoSupportURL
         if "https://py-shorten.herokuapp.com/" in self.url:
             raise SameDomin
-    
+
         return None
 
     def init_by_decode(self, s: str):

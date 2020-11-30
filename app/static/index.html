@@ -28,6 +28,8 @@
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary" type="button" v-on:click="createShortURL"> 縮網址
                             </button>
+                            <button class="btn btn-outline-secondary" type="button" v-on:click="previewShortURL"> 縮網址解析
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -40,9 +42,23 @@
                 <div class="col-8">
                     <div class="card text-center">
                         <div class="card-body">
-                            <p class="card-text">http://0.0.0.0:17995/{{ shortURL }}
+                            <p class="card-text">https://py-shorten.herokuapp.com/{{ shortURL }}
                             </p>
                             <button v-on:click="copyButton">COPY</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2"></div>
+            </div>
+        </div>
+        <div class="container" v-if="encodeURL !== ''">
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-8">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <p class="card-text"> {{ encodeURL }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -53,18 +69,25 @@
     <script src="https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
+        var getLocation = function (href) {
+            var l = document.createElement("a");
+            l.href = href;
+            return l;
+        };
+
         new Vue({
             el: '#app',
             data: {
                 longURL: "",
                 shortURL: "",
+                encodeURL: "",
                 message: 'Hello World!'
             },
             methods: {
                 createShortURL: function (event) {
                     axios
-                        .post('http://0.0.0.0:17995/api/v1/shorten', {
-                            url: this.longURL, // 参数 firstName
+                        .post('/api/v1/shorten', {
+                            url: this.longURL,
                         })
                         .then(response => (
                             this.shortURL = response.data['short']
@@ -84,10 +107,38 @@
                                 console.log('Error', error.message);
                             }
                         });
+                    this.encodeURL = "";
+                },
+                previewShortURL: function (event) {
+                    var l = getLocation(this.longURL);
+                    if (l.hostname !== "py-shorten.herokuapp.com") {
+                        alert("不支援該網域解析: " + l.hostname);
+                        return
+                    }
+                    axios
+                        .get('/api/v1/shorten' + l.pathname + "/preview")
+                        .then(response => (
+                            this.encodeURL = response.data['url']
+                        ))
+                        .catch(function (error) { // 请求失败处理
+                            if (error.response) {
+                                // Request made and server responded
+                                console.log(error.response.data);
+                                console.log(error.response.status);
+                                console.log(error.response.headers);
+                                alert(error.response.data['error']);
+                            } else if (error.request) {
+                                // The request was made but no response was received
+                                console.log(error.request);
+                            } else {
+                                // Something happened in setting up the request that triggered an Error
+                                console.log('Error', error.message);
+                            }
+                        });
                 },
                 copyButton: function () {
                     const el = document.createElement('textarea');
-                    el.value = "http://0.0.0.0:17995/this.shortURL";
+                    el.value = "https://py-shorten.herokuapp.com/" + this.shortURL;
                     el.setAttribute('readonly', '');
                     el.style.position = 'absolute';
                     el.style.left = '-9999px';

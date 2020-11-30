@@ -11,7 +11,7 @@ from app.errors import ToManyShortURL, NoSupportShortURLCharacter, NoSupportURL,
 short_url_api = Blueprint('short_url_api', __name__)
 
 
-@short_url_api.route('/', methods=['POST'])
+@short_url_api.route('/', methods=['POST'], strict_slashes=False)
 def createShortURL():
     result = ShortURL()
     try:
@@ -39,7 +39,7 @@ def createShortURL():
     return result.toJSON(), 200
 
 
-@short_url_api.route('/<string:short_url>', methods=['GET'])
+@short_url_api.route('/<string:short_url>', methods=['GET'], strict_slashes=False)
 def encodeShortURL(short_url: str):
     result = ShortURL()
     result.init_by_decode(short_url)
@@ -48,10 +48,13 @@ def encodeShortURL(short_url: str):
     return result.toJSON(), 301
 
 
-@short_url_api.route('/<short_url>/preview', methods=['GET'])
+@short_url_api.route('/<string:short_url>/preview', methods=['GET'], strict_slashes=False)
 def previewShortURL(short_url: str):
     result = ShortURL()
     result.init_by_decode(short_url)
     result = result.get_by_id()
+
+    if result is None:
+        return {"error": "Not found"}, 404
 
     return result.toJSON(), 200
